@@ -3,7 +3,7 @@ module KML #:nodoc:
   class Object
     # The KML object ID
     attr_accessor :id
-    
+
     # Initialize the object, optionally passing a Hash of attributes to set.
     def initialize(attributes=nil)
       if attributes
@@ -16,6 +16,14 @@ module KML #:nodoc:
           raise ArgumentError, "Attributes must be specified as a Hash"
         end
       end
+    end
+
+    def parse(node)
+      self.id = node['id']
+      node.element_children.each do |cld|
+        yield cld
+      end
+      self
     end
   end
 end

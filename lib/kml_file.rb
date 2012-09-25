@@ -28,6 +28,29 @@ class KMLFile
     File.open(filename, 'w') { |f| f.write render }
   end
 
+  # Parse the KML file using nokogiri
+  # <kml xmlns="http://www.opengis.net/kml/2.2">
+  #   <NetworkLinkControl> ... </NetworkLinkControl>
+  #   <!-- 0 or 1 Feature elements -->
+  # </kml>
+  def self.parse(io)
+    kml = self.new
+    doc = Nokogiri::XML::Document.parse(io)
+    doc.root.element_children.each do |node|
+      case node.name
+      when 'Document'
+        kml.objects << KML::Document.parse(node)
+      when 'Folder'
+      when 'NetworkLink'
+      when 'Placemark'
+      when 'GroundOverlay'
+      when 'PhotoOverlay'
+      when 'ScreenOverlay'
+      end
+    end
+    kml
+  end
+
 end
 
 require 'kml/object'

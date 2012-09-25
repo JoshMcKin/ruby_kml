@@ -17,7 +17,7 @@
 #     <StyleSelector>...</StyleSelector>
 #     <Region>...</Region>
 #     <Metadata>...</Metadata>
-#   
+#
 #     <!-- specific to Placemark element -->
 #     <Geometry>...</Geometry>
 #   </Placemark>
@@ -25,7 +25,7 @@
 module KML
   class Placemark < KML::Container
     attr_accessor :geometry
-    
+
     def render(xm=Builder::XmlMarkup.new(:indent => 2))
       xm.Placemark {
         super
@@ -33,6 +33,26 @@ module KML
         plain_children.each { |c| xm << c }
         geometry.render(xm) unless geometry.nil?
       }
+    end
+
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
+    def parse(node)
+      super(node) do |cld|
+        case cld.name
+        when 'MultiGeometry'
+          self.geometry = KML::MultiGeometry.parse(cld)
+        when 'Polygon'
+          self.geometry = KML::Polygon.parse(cld)
+        else
+          puts "Placemark"
+          p cld
+          puts
+        end
+      end
+      self
     end
   end
 end

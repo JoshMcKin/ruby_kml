@@ -24,21 +24,56 @@ module KML #:nodoc:
   # which gives the appearance of a building. When a Polygon is extruded, each point is extruded individually. 
   # Extruded Polygons use PolyStyle for their color, color mode, and fill.
   class Polygon < Geometry
-    attr_accessor :inner_boundary_is
     attr_accessor :outer_boundary_is
-    
+
+    def inner_boundary_is
+      @inner_boundary_is ||= []
+    end
+
     def render(xm=Builder::XmlMarkup.new(:indent => 2))
       xm.Polygon {
         super
         xm.outerBoundaryIs {
           outer_boundary_is.render(xm)
         }
-        unless inner_boundary_is.nil?
+        inner_boundary_is.each do |ib|
           xm.innerBoundaryIs {
-            inner_boundary_is.render(xm)
+            ib.render(xm)
           }
         end
       }
+    end
+
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
+    def parse(node)
+      super(node) do |cld|
+        case cld.name
+        when 'outerBoundaryIs'
+          self.outer_boundary_is = self.parse_boundary(cld)
+        when 'innerBoundaryIs'
+          self.inner_boundary_is << self.parse_boundary(cld)
+        else
+          puts "Polygon"
+          p cld
+          puts
+        end
+      end
+      self
+    end
+
+    # should only contain a LinearRing
+    def parse_boundary(node)
+      ring = nil
+      node.element_children.each do |cld|
+        case cld.name
+        when 'LinearRing'
+          ring = KML::LinearRing.parse(cld)
+        end
+      end
+      ring
     end
   end
 end

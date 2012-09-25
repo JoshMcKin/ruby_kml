@@ -6,18 +6,18 @@ module KML
     def extrude?
       @extrude
     end
-    
+
     # Set to true to extrude.
     def extrude=(v)
       @extrude = v
     end
-    
+
     # Return nil if extrude has not been defined, otherwise return '1' for true or '0' for false.
     def extrude
       return nil unless @extrude
       @extrude ? '1' : '0'
     end
-    
+
     # Specifies whether to allow lines and paths to follow the terrain. This specification applies only to LineStrings 
     # (paths) and LinearRings (polygons) that have an +altitude_mode+ of "clampToGround". Very long lines should enable 
     # tessellation so that they follow the curvature of the earth (otherwise, they may go underground and be hidden).
@@ -25,18 +25,18 @@ module KML
     def tessellate?
       @tessellate
     end
-    
+
     # Set to true to tessellate.
     def tessellate=(v)
       @tessellate = v
     end
-    
+
     # Return nil if tessellate has not been defined, otherwise return '1' for true or '0' for false.
     def tessellate
       return nil unless @tessellate
       @tessellate ? '1' : '0'
     end
-    
+
     # Specifies how altitude components in the <coordinates> element are interpreted. Possible values are:
     # 
     # * clampToGround - (default) Indicates to ignore an altitude specification (for example, in the +coordinates+).
@@ -54,11 +54,11 @@ module KML
     def altitude_mode
       @altitude_mode || 'clampToGround'
     end
-    
+
     def altitude_mode_set?
       !(@altitude_mode.nil?)
     end
-    
+
     # Set the altitude mode
     def altitude_mode=(mode)
       allowed_modes = %w(clampToGround relativeToGround absolute)
@@ -68,13 +68,29 @@ module KML
         raise ArgumentError, "Must be one of the allowed altitude modes: #{allowed_modes.join(',')}"
       end
     end
-    
+
     def render(xm=Builder::XmlMarkup.new(:indent => 2))
       xm.extrude(extrude) unless extrude.nil?
       xm.tessellate(tessellate) unless tessellate.nil?
       xm.altitudeMode(altitude_mode) if altitude_mode_set?
     end
-    
+
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
+    def parse(node)
+      super(node) do |cld|
+        case cld.name
+        when 'tessellate'
+          self.tessellate = cld.content
+        else
+          yield cld
+        end
+      end
+      self
+    end
+
   end
 end
 

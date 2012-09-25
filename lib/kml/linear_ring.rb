@@ -20,7 +20,7 @@ module KML #:nodoc:
     def coordinates
       @coordinates
     end
-    
+
     # Set the coordinates
     def coordinates=(c)
       case c
@@ -37,13 +37,31 @@ module KML #:nodoc:
         raise ArgumentError, "Coordinates must either be a String or an Array of Arrays"
       end
     end
-    
+
     def render(xm=Builder::XmlMarkup.new(:indent => 2))
       raise ArgumentError, "Coordinates required" if coordinates.nil?
       xm.LinearRing {
         super
         xm.coordinates(coordinates.collect { |c| c.join(',') }.join(" "))
       }
+    end
+
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
+    def parse(node)
+      super(node) do |cld|
+        case cld.name
+        when 'coordinates'
+          self.coordinates = cld.content
+        else
+          puts "LinearRing"
+          p cld
+          puts
+        end
+      end
+      self
     end
   end
 end

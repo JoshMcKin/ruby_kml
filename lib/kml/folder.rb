@@ -8,5 +8,22 @@ module KML #:nodoc:
         features.each { |f| f.render(xm) }
       }
     end
+
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
+    def parse(node)
+      super(node) do |cld|
+        case cld.name
+        when 'Stylex'
+        when 'Schemax'
+        else
+          puts "Folder"
+          p cld
+          puts
+        end
+      end
+    end
   end
 end
