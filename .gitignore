@@ -1,2 +1,3 @@
 doc
 test/*.kml
+*.DS_Store
