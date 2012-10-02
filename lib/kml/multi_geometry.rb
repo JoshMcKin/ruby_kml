@@ -4,13 +4,19 @@ module KML
       xm.MultiGeometry { features.each { |f| f.render(xm) } }
     end
 
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
     def parse(node)
       super(node) do |cld|
         case cld.name
         when 'Polygon'
           self.features << KML::Polygon.parse(cld)
         else
-          yield cld
+          puts "MultiGeometry"
+          p cld
+          puts
         end
       end
       self

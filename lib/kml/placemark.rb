@@ -46,6 +46,8 @@ module KML
           self.geometry = KML::MultiGeometry.parse(cld)
         when 'Polygon'
           self.geometry = KML::Polygon.parse(cld)
+        when 'Point'
+          self.geometry = KML::Point.parse(cld)
         else
           puts "Placemark"
           p cld

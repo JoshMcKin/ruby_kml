@@ -9,12 +9,11 @@
 #   )
 #   puts f.render
 class KMLFile
-  attr_accessor :objects
-
   # The objects in the KML file
   def objects
     @objects ||= []
   end
+  alias :features :objects
 
   # Render the KML file
   def render(xm=Builder::XmlMarkup.new(:indent => 2))
@@ -36,10 +35,10 @@ class KMLFile
   def self.parse(io)
     kml = self.new
     doc = Nokogiri::XML::Document.parse(io)
-    doc.root.element_children.each do |node|
-      case node.name
+    doc.root.element_children.each do |cld|
+      case cld.name
       when 'Document'
-        kml.objects << KML::Document.parse(node)
+        kml.features << KML::Document.parse(cld)
       when 'Folder'
       when 'NetworkLink'
       when 'Placemark'

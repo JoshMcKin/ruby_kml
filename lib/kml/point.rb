@@ -8,7 +8,7 @@
 # </Point>
 module KML
   class Point < Geometry
-    
+
     # A single tuple consisting of floating point values for longitude, latitude, and altitude (in that order). 
     # Longitude and latitude values are in degrees, where:
     #
@@ -18,12 +18,12 @@ module KML
     def coordinates
       @coordinates
     end
-    
+
     # Set the coordinates
     def coordinates=(c)
       case c
       when String
-        @coordinates = c.split(',')
+        @coordinates = c.strip.split(',')
         unless @coordinates.length == 2 || @coordinates.length == 3
           raise "Coordinates string may only have 2 parts (indicating lat and long) or 3 parts (lat, long and altitude)"
         end
@@ -35,13 +35,31 @@ module KML
         raise ArgumentError, "Coordinates must be either a String, Hash or an Array"
       end
     end
-    
+
     def render(xm=Builder::XmlMarkup.new(:indent => 2))
       xm.Point {
         super
         xm.coordinates(coordinates.join(","))
       }
     end
-    
+
+    def self.parse(node)
+      self.new.parse(node)
+    end
+
+    def parse(node)
+      super(node) do |cld|
+        case cld.name
+        when 'coordinates'
+          self.coordinates = cld.content
+        else
+          puts "Point"
+          p cld
+          puts
+        end
+      end
+      self
+    end
+
   end
 end
