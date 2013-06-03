@@ -16,6 +16,9 @@
 #       <coordinates>...</coordinates>         <!-- lon,lat[,alt] -->
 #     </LinearRing>
 #   </innerBoundaryIs>
+#   <innerBoundaryIs>
+#     ...
+#   </innerBoundaryIs>
 # </Polygon>
 
 module KML #:nodoc:
@@ -28,6 +31,15 @@ module KML #:nodoc:
 
     def inner_boundary_is
       @inner_boundary_is ||= []
+    end
+
+    # allow old semantics for adding inner boundaries
+    def inner_boundary_is=(ib)
+      if ib.kind_of?(Array)
+        @inner_boundary_is = ib
+      else
+        self.inner_boundary_is << ib
+      end
     end
 
     def render(xm=Builder::XmlMarkup.new(:indent => 2))
